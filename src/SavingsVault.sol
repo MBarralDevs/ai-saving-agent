@@ -158,4 +158,25 @@ contract SavingsVault is ReentrancyGuard, Pausable, Ownable {
 
         emit Deposited(msg.sender, amount, accounts[msg.sender].currentBalance);
     }
+
+    /**
+     * @notice Withdraw USDC from the vault
+     * @param amount Amount of USDC to withdraw (6 decimals)
+     * @dev For hackathon v1, we withdraw only from vault (not yield strategy yet)
+     */
+    function withdraw(uint256 amount) external nonReentrant whenNotPaused {
+        if (amount == 0) revert SavingsVault__InvalidAmount();
+        if (!accounts[msg.sender].isActive) revert SavingsVault__AccountNotActive();
+        if (accounts[msg.sender].currentBalance < amount) revert SavingsVault__InsufficientBalance();
+
+        // Update user account
+        accounts[msg.sender].totalWithdrawn += amount;
+        accounts[msg.sender].currentBalance -= amount;
+        totalValueLocked -= amount;
+
+        // Transfer USDC to user
+        usdc.safeTransfer(msg.sender, amount);
+
+        emit Withdrawn(msg.sender, amount, accounts[msg.sender].currentBalance);
+    }
 }
