@@ -13,6 +13,30 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
  * @dev Users deposit USDC, set goals, and funds are later routed to yield strategies
  */
 contract SavingsVault is ReentrancyGuard, Pausable, Ownable {
+    using SafeERC20 for IERC20;
+
+    // =============================================================
+    //                          STRUCTS
+    // =============================================================
+
+    /// @notice User's savings configuration and balance
+    struct UserAccount {
+        uint256 totalDeposited; // Total USDC deposited by user
+        uint256 totalWithdrawn; // Total USDC withdrawn by user
+        uint256 currentBalance; // Current balance in vault + yield strategy
+        uint256 weeklyGoal; // Target savings per week (in USDC, 6 decimals)
+        uint256 safetyBuffer; // Minimum balance to maintain in wallet
+        uint256 lastSaveTimestamp; // Last time AI triggered a save
+        bool isActive; // Whether user account is active
+        TrustMode trustMode; // Manual approval or auto-pilot
+    }
+
+    /// @notice Trust mode for AI automation
+    enum TrustMode {
+        MANUAL, // AI suggests, user approves each save
+        AUTO // AI executes automatically
+    }
+
     // =============================================================
     //                       STATE VARIABLES
     // =============================================================
