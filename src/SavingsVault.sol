@@ -110,4 +110,33 @@ contract SavingsVault is ReentrancyGuard, Pausable, Ownable {
         if (_usdc == address(0)) revert SavingsVault__ZeroAddress();
         usdc = IERC20(_usdc);
     }
+
+    // =============================================================
+    //                     USER FUNCTIONS
+    // =============================================================
+
+    /**
+     * @notice Create a new user account with savings goals
+     * @param weeklyGoal Target amount to save per week (6 decimals)
+     * @param safetyBuffer Minimum balance to keep in wallet (6 decimals)
+     * @param trustMode Whether AI needs manual approval or can auto-execute
+     */
+
+    function createAccount(uint256 weeklyGoal, uint256 safetyBuffer, TrustMode trustMode) external {
+        if (accounts[msg.sender].isActive) revert SavingsVault__AccountAlreadyExists();
+        if (weeklyGoal <= 0) revert SavingsVault__GoalNotPositive();
+
+        accounts[msg.sender] = UserAccount({
+            totalDeposited: 0,
+            totalWithdrawn: 0,
+            currentBalance: 0,
+            weeklyGoal: weeklyGoal,
+            safetyBuffer: safetyBuffer,
+            lastSaveTimestamp: 0,
+            isActive: true,
+            trustMode: trustMode
+        });
+
+        emit AccountCreated(msg.sender, weeklyGoal, safetyBuffer, trustMode);
+    }
 }
