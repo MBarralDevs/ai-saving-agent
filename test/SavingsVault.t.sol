@@ -62,4 +62,28 @@ contract SavingsVaultTest is Test {
 
         vm.stopPrank();
     }
+
+    // =============================================================
+    //                     DEPOSIT TESTS
+    // =============================================================
+
+    function testDeposit() public {
+        vm.startPrank(alice);
+
+        // Create account
+        vault.createAccount(100e6, 500e6, SavingsVault.TrustMode.MANUAL);
+
+        // Approve vault to spend USDC
+        usdc.approve(address(vault), 1000e6);
+
+        // Deposit
+        vault.deposit(1000e6);
+
+        SavingsVault.UserAccount memory account = vault.getAccount(alice);
+        assertEq(account.currentBalance, 1000e6);
+        assertEq(account.totalDeposited, 1000e6);
+        assertEq(vault.totalValueLocked(), 1000e6);
+
+        vm.stopPrank();
+    }
 }
