@@ -260,4 +260,34 @@ contract SavingsVaultTest is Test {
 
         vm.stopPrank();
     }
+
+    // =============================================================
+    //                   UPDATE TESTS
+    // =============================================================
+
+    function testUpdateGoal() public {
+        vm.startPrank(alice);
+
+        vault.createAccount(100e6, 500e6, SavingsVault.TrustMode.MANUAL);
+
+        vault.updateGoal(200e6);
+
+        SavingsVault.UserAccount memory account = vault.getAccount(alice);
+        assertEq(account.weeklyGoal, 200e6);
+
+        vm.stopPrank();
+    }
+
+    function testUpdateTrustMode() public {
+        vm.startPrank(alice);
+
+        vault.createAccount(100e6, 500e6, SavingsVault.TrustMode.MANUAL);
+
+        vault.updateTrustMode(SavingsVault.TrustMode.AUTO);
+
+        SavingsVault.UserAccount memory account = vault.getAccount(alice);
+        assertTrue(account.trustMode == SavingsVault.TrustMode.AUTO);
+
+        vm.stopPrank();
+    }
 }
