@@ -180,4 +180,27 @@ contract SavingsVaultTest is Test {
 
         vm.stopPrank();
     }
+
+    function testAutoSaveAutoMode() public {
+        vm.startPrank(alice);
+
+        // Create account in AUTO mode
+        vault.createAccount(100e6, 500e6, SavingsVault.TrustMode.AUTO);
+
+        // Approve vault to spend USDC
+        usdc.approve(address(vault), 100e6);
+        vm.warp(block.timestamp + 1 days); // Advance time by 1 day to be sure to allow saving
+
+        vm.stopPrank();
+
+        // x402 executor triggers save
+        vm.startPrank(x402Executor);
+
+        vault.autoSave(alice, 100e6);
+
+        SavingsVault.UserAccount memory account = vault.getAccount(alice);
+        assertEq(account.currentBalance, 100e6);
+
+        vm.stopPrank();
+    }
 }
