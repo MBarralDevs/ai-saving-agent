@@ -109,4 +109,45 @@ contract SavingsVaultTest is Test {
 
         vm.stopPrank();
     }
+
+    // =============================================================
+    //                     WITHDRAWAL TESTS
+    // =============================================================
+
+    function testWithdraw() public {
+        vm.startPrank(alice);
+
+        // Setup: create account and deposit
+        vault.createAccount(100e6, 500e6, SavingsVault.TrustMode.MANUAL);
+        usdc.approve(address(vault), 1000e6);
+        vault.deposit(1000e6);
+
+        uint256 balanceBefore = usdc.balanceOf(alice);
+
+        // Withdraw
+        vault.withdraw(400e6);
+
+        uint256 balanceAfter = usdc.balanceOf(alice);
+
+        assertEq(balanceAfter - balanceBefore, 400e6);
+
+        SavingsVault.UserAccount memory account = vault.getAccount(alice);
+        assertEq(account.currentBalance, 600e6);
+        assertEq(account.totalWithdrawn, 400e6);
+
+        vm.stopPrank();
+    }
+
+    function testCannotWithdrawMoreThanBalance() public {
+        vm.startPrank(alice);
+
+        vault.createAccount(100e6, 500e6, SavingsVault.TrustMode.MANUAL);
+        usdc.approve(address(vault), 1000e6);
+        vault.deposit(1000e6);
+
+        vm.expectRevert(SavingsVault.SavingsVault__InsufficientBalance.selector);
+        vault.withdraw(1001e6);
+
+        vm.stopPrank();
+    }
 }
