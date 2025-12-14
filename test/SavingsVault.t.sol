@@ -165,7 +165,6 @@ contract SavingsVaultTest is Test {
         usdc.approve(address(vault), 100e6);
 
         uint256 balanceBefore = usdc.balanceOf(alice);
-        vm.warp(block.timestamp + 1 days); // Advance time by 1 day to be sure to allow saving
 
         // Alice triggers save herself (manual mode)
         vault.autoSave(alice, 100e6);
@@ -189,7 +188,6 @@ contract SavingsVaultTest is Test {
 
         // Approve vault to spend USDC
         usdc.approve(address(vault), 100e6);
-        vm.warp(block.timestamp + 1 days); // Advance time by 1 day to be sure to allow saving
 
         vm.stopPrank();
 
@@ -209,7 +207,6 @@ contract SavingsVaultTest is Test {
 
         vault.createAccount(100e6, 500e6, SavingsVault.TrustMode.AUTO);
         usdc.approve(address(vault), 100e6);
-        vm.warp(block.timestamp + 1 days); // Advance time by 1 day to be sure to allow saving
 
         // Alice tries to trigger save herself (should fail in AUTO mode)
         vm.expectRevert(SavingsVault.SavingsVault__UnauthorizedCaller.selector);
@@ -223,7 +220,6 @@ contract SavingsVaultTest is Test {
 
         vault.createAccount(100e6, 500e6, SavingsVault.TrustMode.MANUAL);
         usdc.approve(address(vault), 200e6);
-        vm.warp(block.timestamp + 1 days); // Advance time by 1 day to be sure to allow saving
 
         // First save
         vault.autoSave(alice, 100e6);
@@ -253,7 +249,6 @@ contract SavingsVaultTest is Test {
 
         vault.createAccount(100e6, 500e6, SavingsVault.TrustMode.MANUAL);
         usdc.approve(address(vault), 20000e6);
-        vm.warp(block.timestamp + 1 days); // Advance time by 1 day to be sure to allow saving
 
         vm.expectRevert(SavingsVault.SavingsVault__AmountExceedsLimit.selector);
         vault.autoSave(alice, 15000e6); // Above 10k limit
