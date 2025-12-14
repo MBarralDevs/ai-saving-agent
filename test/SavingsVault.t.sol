@@ -257,6 +257,22 @@ contract SavingsVaultTest is Test {
         vm.stopPrank();
     }
 
+    function testFirstSaveIgnoresRateLimit() public {
+        vm.startPrank(alice);
+
+        vault.createAccount(100e6, 500e6, SavingsVault.TrustMode.MANUAL);
+        usdc.approve(address(vault), 100e6);
+
+        // First save should work immediately (no rate limit)
+        vault.autoSave(alice, 100e6);
+
+        SavingsVault.UserAccount memory account = vault.getAccount(alice);
+        assertEq(account.currentBalance, 100e6);
+        assertEq(account.lastSaveTimestamp, block.timestamp);
+
+        vm.stopPrank();
+    }
+
     // =============================================================
     //                   UPDATE TESTS
     // =============================================================
