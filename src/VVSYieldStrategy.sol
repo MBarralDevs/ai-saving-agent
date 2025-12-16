@@ -211,4 +211,47 @@ contract VVSYieldStrategy is ReentrancyGuard, Ownable {
 
         return usdcAmount;
     }
+
+    // =============================================================
+    //                   INTERNAL FUNCTIONS
+    // =============================================================
+
+    /**
+     * @notice Swap USDC to USDT using VVS Router
+     * @param usdcAmount Amount of USDC to swap
+     * @return usdtAmount Amount of USDT received
+     */
+    function _swapUSDCToUSDT(uint256 usdcAmount) internal returns (uint256 usdtAmount) {
+        address[] memory path = new address[](2);
+        path[0] = address(usdc);
+        path[1] = address(usdt);
+
+        // Calculate minimum output with slippage tolerance
+        uint256 minOutput = (usdcAmount * (10000 - slippageTolerance)) / 10000;
+
+        uint256[] memory amounts = vvsRouter.swapExactTokensForTokens(
+            usdcAmount, minOutput, path, address(this), block.timestamp + 15 minutes
+        );
+
+        return amounts[1]; // USDT amount received
+    }
+
+    /**
+     * @notice Swap USDT to USDC using VVS Router
+     * @param usdtAmount Amount of USDT to swap
+     * @return usdcAmount Amount of USDC received
+     */
+    function _swapUSDTToUSDC(uint256 usdtAmount) internal returns (uint256 usdcAmount) {
+        address[] memory path = new address[](2);
+        path[0] = address(usdt);
+        path[1] = address(usdc);
+
+        uint256 minOutput = (usdtAmount * (10000 - slippageTolerance)) / 10000;
+
+        uint256[] memory amounts = vvsRouter.swapExactTokensForTokens(
+            usdtAmount, minOutput, path, address(this), block.timestamp + 15 minutes
+        );
+
+        return amounts[1]; // USDC amount received
+    }
 }
