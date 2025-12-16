@@ -254,4 +254,58 @@ contract VVSYieldStrategy is ReentrancyGuard, Ownable {
 
         return amounts[1]; // USDC amount received
     }
+
+    /**
+     * @notice Add liquidity to VVS USDC-USDT pool
+     * @param usdcAmount Amount of USDC
+     * @param usdtAmount Amount of USDT
+     * @return usdcUsed Actual USDC used
+     * @return usdtUsed Actual USDT used
+     * @return liquidity LP tokens received
+     */
+    function _addLiquidity(uint256 usdcAmount, uint256 usdtAmount)
+        internal
+        returns (uint256 usdcUsed, uint256 usdtUsed, uint256 liquidity)
+    {
+        // Calculate minimum amounts with slippage tolerance
+        uint256 usdcMin = (usdcAmount * (10000 - slippageTolerance)) / 10000;
+        uint256 usdtMin = (usdtAmount * (10000 - slippageTolerance)) / 10000;
+
+        (usdcUsed, usdtUsed, liquidity) = vvsRouter.addLiquidity(
+            address(usdc),
+            address(usdt),
+            usdcAmount,
+            usdtAmount,
+            usdcMin,
+            usdtMin,
+            address(this),
+            block.timestamp + 15 minutes
+        );
+
+        return (usdcUsed, usdtUsed, liquidity);
+    }
+
+    /**
+     * @notice Remove liquidity from VVS USDC-USDT pool
+     * @param liquidity Amount of LP tokens to burn
+     * @return usdcAmount USDC received
+     * @return usdtAmount USDT received
+     */
+    function _removeLiquidity(uint256 liquidity) internal returns (uint256 usdcAmount, uint256 usdtAmount) {
+        // Approve pair tokens to router
+        IERC20(address(usdcUsdtPair)).approve(address(vvsRouter), liquidity);
+
+        // Calculate minimum amounts (set to 0 for simplicity, can be improved)
+        (usdcAmount, usdtAmount) = vvsRouter.removeLiquidity(
+            address(usdc),
+            address(usdt),
+            liquidity,
+            0, // Accept any amount (can be improved with price oracle)
+            0,
+            address(this),
+            block.timestamp + 15 minutes
+        );
+
+        return (usdcAmount, usdtAmount);
+    }
 }
