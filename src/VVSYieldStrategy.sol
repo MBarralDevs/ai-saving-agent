@@ -308,4 +308,49 @@ contract VVSYieldStrategy is ReentrancyGuard, Ownable {
 
         return (usdcAmount, usdtAmount);
     }
+
+    // =============================================================
+    //                     VIEW FUNCTIONS
+    // =============================================================
+
+    /**
+     * @notice Get user's current USDC value in the pool (including yield)
+     * @param user Address of user
+     * @return usdcValue Estimated USDC value
+     * @dev This is an approximation based on LP token share
+     */
+    function getUserValue(address user) external view returns (uint256 usdcValue) {
+        uint256 userLiquidity = userLiquidityTokens[user];
+        if (userLiquidity == 0) return 0;
+
+        // Get total reserves in the pool
+        (uint112 reserve0, uint112 reserve1,) = usdcUsdtPair.getReserves();
+        uint256 totalSupply = usdcUsdtPair.totalSupply();
+
+        // Determine which reserve is USDC
+        address token0 = usdcUsdtPair.token0();
+        uint256 usdcReserve = (token0 == address(usdc)) ? reserve0 : reserve1;
+        uint256 usdtReserve = (token0 == address(usdc)) ? reserve1 : reserve0;
+
+        // Calculate user's share of reserves
+        uint256 userUSDC = (usdcReserve * userLiquidity) / totalSupply;
+        uint256 userUSDT = (usdtReserve * userLiquidity) / totalSupply;
+
+        // Return total value in USDC (assume 1:1 USDC:USDT for simplicity)
+        return userUSDC + userUSDT;
+    }
+
+    /**
+     * @notice Calculate yield earned by user
+     * @param user Address of user
+     * @param initialDeposit Original USDC deposited
+     * @return yieldEarned USDC yield earned
+     */
+    function calculateYield(address user, uint256 initialDeposit) external view returns (uint256 yieldEarned) {
+        uint256 currentValue = this.getUserValue(user);
+        if (currentValue > initialDeposit) {
+            return currentValue - initialDeposit;
+        }
+        return 0;
+    }
 }
