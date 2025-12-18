@@ -112,4 +112,16 @@ contract VVSYieldStrategyTest is Test {
 
         vm.stopPrank();
     }
+
+    function testCannotWithdrawMoreThanBalance() public {
+        vm.startPrank(vault);
+
+        usdc.approve(address(strategy), 1000e6);
+        uint256 lpTokens = strategy.deposit(alice, 1000e6);
+
+        vm.expectRevert(VVSYieldStrategy.VVSYieldStrategy__InsufficientLiquidity.selector);
+        strategy.withdraw(alice, lpTokens + 1);
+
+        vm.stopPrank();
+    }
 }
