@@ -60,4 +60,22 @@ contract VVSYieldStrategyTest is Test {
 
         vm.stopPrank();
     }
+
+    function testCannotDepositZero() public {
+        vm.startPrank(vault);
+
+        vm.expectRevert(VVSYieldStrategy.VVSYieldStrategy__ZeroAmount.selector);
+        strategy.deposit(alice, 0);
+
+        vm.stopPrank();
+    }
+
+    function testCannotDepositAsNonVault() public {
+        vm.startPrank(alice);
+
+        vm.expectRevert(VVSYieldStrategy.VVSYieldStrategy__OnlyVault.selector);
+        strategy.deposit(alice, 1000e6);
+
+        vm.stopPrank();
+    }
 }
