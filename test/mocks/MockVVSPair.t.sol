@@ -10,7 +10,7 @@ contract MockVVSPair {
         token1 = _token1;
     }
 
-    function getReserves() external pure returns (uint112, uint112, uint32) {
+    function getReserves() external view returns (uint112, uint112, uint32) {
         // Mock reserves (1M each)
         return (1000000e6, 1000000e6, uint32(block.timestamp));
     }
