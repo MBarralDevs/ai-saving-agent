@@ -39,4 +39,25 @@ contract VVSYieldStrategyTest is Test {
         // Give router some USDT for swaps
         usdt.mint(address(vvsRouter), 100000e6);
     }
+
+    // =============================================================
+    //                   DEPOSIT TESTS
+    // =============================================================
+
+    function testDeposit() public {
+        vm.startPrank(vault);
+
+        // Approve strategy to spend USDC
+        usdc.approve(address(strategy), 1000e6);
+
+        // Deposit
+        uint256 lpTokens = strategy.deposit(alice, 1000e6);
+
+        // Check LP tokens were received
+        assertGt(lpTokens, 0);
+        assertEq(strategy.userLiquidityTokens(alice), lpTokens);
+        assertEq(strategy.totalLiquidityTokens(), lpTokens);
+
+        vm.stopPrank();
+    }
 }
