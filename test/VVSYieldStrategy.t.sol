@@ -225,4 +225,24 @@ contract VVSYieldStrategyTest is Test {
         // For simplified mock, value should be similar
         assertApproxEqRel(laterValue, initialValue, 0.1e18); // Within 10%
     }
+
+    function testGetUserValueWithNoDeposit() public view {
+        uint256 value = strategy.getUserValue(alice);
+        assertEq(value, 0);
+    }
+
+    function testCalculateYieldNoYield() public {
+        vm.startPrank(vault);
+
+        usdc.approve(address(strategy), 1000e6);
+        strategy.deposit(alice, 1000e6);
+
+        // For simplified mock, yield should be ~0
+        uint256 yieldEarned = strategy.calculateYield(alice, 1000e6);
+
+        // Allow small variance due to rounding
+        assertLe(yieldEarned, 100e6); // Less than 10% variance
+
+        vm.stopPrank();
+    }
 }
