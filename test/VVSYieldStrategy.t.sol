@@ -265,4 +265,27 @@ contract VVSYieldStrategyTest is Test {
         strategy.setSlippageTolerance(100); // 1%
         assertEq(strategy.slippageTolerance(), 100);
     }
+
+    function testCannotSetSlippageTooHigh() public {
+        vm.expectRevert(VVSYieldStrategy.VVSYieldStrategy__SlippageTooHigh.selector);
+        strategy.setSlippageTolerance(501); // > 5%
+    }
+
+    function testOnlyOwnerCanSetSlippage() public {
+        vm.startPrank(alice);
+
+        vm.expectRevert();
+        strategy.setSlippageTolerance(100);
+
+        vm.stopPrank();
+    }
+
+    function testOnlyOwnerCanSetVault() public {
+        vm.startPrank(alice);
+
+        vm.expectRevert();
+        strategy.setSavingsVault(address(0x999));
+
+        vm.stopPrank();
+    }
 }
