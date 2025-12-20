@@ -48,4 +48,29 @@ contract IntegrationTest is Test {
         usdc.mint(alice, 10000e6);
         usdc.mint(bob, 10000e6);
     }
+
+    // =============================================================
+    //                   INTEGRATION TESTS
+    // =============================================================
+
+    function testDepositAutoRoutesToYield() public {
+        vm.startPrank(alice);
+
+        // Create account
+        vault.createAccount(100e6, 500e6, SavingsVault.TrustMode.MANUAL);
+
+        // Approve and deposit
+        usdc.approve(address(vault), 1000e6);
+        vault.deposit(1000e6);
+
+        // Check vault balance
+        SavingsVault.UserAccount memory account = vault.getAccount(alice);
+        assertEq(account.currentBalance, 1000e6);
+
+        // Check strategy has LP tokens for alice
+        uint256 lpTokens = strategy.userLiquidityTokens(alice);
+        assertGt(lpTokens, 0, "Should have LP tokens in strategy");
+
+        vm.stopPrank();
+    }
 }
