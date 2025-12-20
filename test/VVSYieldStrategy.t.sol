@@ -323,4 +323,28 @@ contract VVSYieldStrategyTest is Test {
 
         vm.stopPrank();
     }
+
+    function testDepositWithdrawRoundTrip() public {
+        vm.startPrank(vault);
+
+        uint256 initialBalance = usdc.balanceOf(vault);
+
+        // Deposit
+        usdc.approve(address(strategy), 1000e6);
+        uint256 lpTokens = strategy.deposit(alice, 1000e6);
+
+        // Withdraw immediately
+        uint256 usdcReceived = strategy.withdraw(alice, lpTokens);
+
+        uint256 finalBalance = usdc.balanceOf(vault);
+
+        // Should get back approximately what we put in (allow for small slippage)
+        assertGe(usdcReceived, 950e6, "Lost too much in round trip");
+        assertLe(usdcReceived, 1050e6, "Gained too much in round trip");
+
+        // Vault balance should be approximately restored
+        assertGe(finalBalance, initialBalance - 50e6);
+
+        vm.stopPrank();
+    }
 }
