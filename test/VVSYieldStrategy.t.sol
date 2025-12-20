@@ -288,4 +288,39 @@ contract VVSYieldStrategyTest is Test {
 
         vm.stopPrank();
     }
+
+    // =============================================================
+    //                   INTEGRATION TESTS
+    // =============================================================
+
+    function testMultipleUsersDeposit() public {
+        address bob = address(0x3);
+
+        vm.startPrank(vault);
+
+        usdc.approve(address(strategy), 3000e6);
+
+        // Alice deposits
+        uint256 aliceLpTokens = strategy.deposit(alice, 1000e6);
+
+        // Bob deposits
+        uint256 bobLpTokens = strategy.deposit(bob, 2000e6);
+
+        // Check individual balances
+        assertEq(strategy.userLiquidityTokens(alice), aliceLpTokens);
+        assertEq(strategy.userLiquidityTokens(bob), bobLpTokens);
+
+        // Check total
+        assertEq(strategy.totalLiquidityTokens(), aliceLpTokens + bobLpTokens);
+
+        // Check values
+        uint256 aliceValue = strategy.getUserValue(alice);
+        uint256 bobValue = strategy.getUserValue(bob);
+
+        // Bob should have roughly 2x Alice's value
+        assertGe(bobValue, aliceValue * 19 / 10); // Allow 10% variance
+        assertLe(bobValue, aliceValue * 21 / 10);
+
+        vm.stopPrank();
+    }
 }
