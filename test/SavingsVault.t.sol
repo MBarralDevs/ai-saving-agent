@@ -16,6 +16,7 @@ contract SavingsVaultTest is Test {
     address public bob = address(0x2);
     address public x402Executor = address(0x3);
 
+    // Line 20 - change from setX402Executor to setBackendServer
     function setUp() public {
         // Deploy mock USDC
         usdc = new MockUSDC();
@@ -23,13 +24,16 @@ contract SavingsVaultTest is Test {
         // Deploy vault
         vault = new SavingsVault(address(usdc));
 
-        // Set x402 executor
-        vault.setX402Executor(x402Executor);
+        // Set backend server (changed from setX402Executor)
+        vault.setBackendServer(backendServer);
 
         // Give Alice and Bob some USDC
         usdc.mint(alice, 10000e6); // 10k USDC
         usdc.mint(bob, 10000e6);
     }
+
+    // Line 19 - rename variable
+    address public backendServer = address(0x3);
 
     // =============================================================
     //                   ACCOUNT CREATION TESTS
@@ -192,8 +196,8 @@ contract SavingsVaultTest is Test {
 
         vm.stopPrank();
 
-        // x402 executor triggers save
-        vm.startPrank(x402Executor);
+        // Backend server triggers save (changed from x402Executor)
+        vm.startPrank(backendServer);
 
         vault.autoSave(alice, 100e6);
 
