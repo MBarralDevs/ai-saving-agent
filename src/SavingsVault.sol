@@ -59,8 +59,8 @@ contract SavingsVault is ReentrancyGuard, Pausable, Ownable {
     /// @notice Yield strategy contract
     IVVSYieldStrategy public s_yieldStrategy;
 
-    /// @notice x402 executor contract (authorized to trigger auto-saves)
-    address public s_x402Executor;
+    /// @notice Backend server address (authorized to call deposit/autoSave after x402 payment)
+    address public s_backendServer;
 
     /// @notice Mapping of user address to their account
     mapping(address => UserAccount) public s_accounts;
@@ -90,7 +90,7 @@ contract SavingsVault is ReentrancyGuard, Pausable, Ownable {
     event GoalUpdated(address indexed user, uint256 newWeeklyGoal);
     event TrustModeUpdated(address indexed user, TrustMode newMode);
     event YieldStrategyUpdated(address indexed oldStrategy, address indexed newStrategy);
-    event X402ExecutorUpdated(address indexed oldExecutor, address indexed newExecutor);
+    event BackendServerUpdated(address indexed oldServer, address indexed newServer);
 
     // =============================================================
     //                          ERRORS
@@ -105,7 +105,6 @@ contract SavingsVault is ReentrancyGuard, Pausable, Ownable {
     error SavingsVault__ZeroAddress();
     error SavingsVault__GoalNotPositive();
     error SavingsVault__AccountAlreadyExists();
-    error SavingsVault__YieldStrategyNotSet();
 
     // =============================================================
     //                        CONSTRUCTOR
@@ -171,6 +170,32 @@ contract SavingsVault is ReentrancyGuard, Pausable, Ownable {
     }
 
     /**
+     * @notice Deposit USDC on behalf of a user (called by backend after x402 payment verification)
+     * @param user User address to credit
+     * @param amount Amount of USDC to deposit
+     * @dev Only callable by authorized backend server
+     */
+    function depositFor(address user, uint256 amount) external nonReentrant whenNotPaused {
+        if (msg.sender != s_backendServer) revert SavingsVault__UnauthorizedCaller();
+        if (amount < MIN_DEPOSIT) revert SavingsVault__InvalidAmount();
+        if (!s_accounts[user].isActive) revert SavingsVault__AccountNotActive();
+
+        // USDC should already be in vault (transferred via x402/EIP-3009)
+        // Just update accounting
+
+        s_accounts[user].totalDeposited += amount;
+        s_accounts[user].currentBalance += amount;
+        s_totalValueLocked += amount;
+
+        emit Deposited(user, amount, s_accounts[user].currentBalance);
+
+        // Route to yield strategy if set
+        if (address(s_yieldStrategy) != address(0)) {
+            _depositToYield(user, amount);
+        }
+    }
+
+    /**
      * @notice Withdraw USDC from the vault (and yield strategy if needed)
      * @param amount Amount of USDC to withdraw (6 decimals)
      */
@@ -221,51 +246,6 @@ contract SavingsVault is ReentrancyGuard, Pausable, Ownable {
 
         s_accounts[msg.sender].trustMode = newMode;
         emit TrustModeUpdated(msg.sender, newMode);
-    }
-
-    // =============================================================
-    //                   AUTOMATED FUNCTIONS
-    // =============================================================
-
-    /**
-     * @notice Execute an auto-save (called by x402 executor or user in manual mode)
-     * @param user Address of user to save for
-     * @param amount Amount to save
-     * @dev Can be called by: (1) x402Executor if AUTO mode, (2) user themselves in MANUAL mode
-     */
-    function autoSave(address user, uint256 amount) external nonReentrant whenNotPaused {
-        UserAccount storage account = s_accounts[user];
-
-        if (!account.isActive) revert SavingsVault__AccountNotActive();
-        if (amount == 0 || amount > MAX_SAVE_AMOUNT) revert SavingsVault__AmountExceedsLimit();
-
-        // Authorization check
-        if (account.trustMode == TrustMode.AUTO) {
-            if (msg.sender != s_x402Executor) revert SavingsVault__UnauthorizedCaller();
-        } else {
-            if (msg.sender != user) revert SavingsVault__UnauthorizedCaller();
-        }
-
-        // Rate limiting
-        if (account.lastSaveTimestamp != 0 && block.timestamp < account.lastSaveTimestamp + MIN_SAVE_INTERVAL) {
-            revert SavingsVault__SaveIntervalNotMet();
-        }
-
-        // Transfer USDC from user's wallet to vault
-        i_USDC.safeTransferFrom(user, address(this), amount);
-
-        // Update account
-        account.totalDeposited += amount;
-        account.currentBalance += amount;
-        account.lastSaveTimestamp = block.timestamp;
-        s_totalValueLocked += amount;
-
-        emit AutoSaveExecuted(user, amount, msg.sender);
-
-        // Route to yield strategy if set
-        if (address(s_yieldStrategy) != address(0)) {
-            _depositToYield(user, amount);
-        }
     }
 
     // =============================================================
@@ -343,8 +323,6 @@ contract SavingsVault is ReentrancyGuard, Pausable, Ownable {
         // Add value from yield strategy if it exists
         if (address(s_yieldStrategy) != address(0)) {
             uint256 yieldValue = s_yieldStrategy.getUserValue(user);
-            // Account balance already includes deposited amount, so we just return the yield value
-            // which represents current worth in the strategy
             return yieldValue;
         }
 
@@ -359,6 +337,7 @@ contract SavingsVault is ReentrancyGuard, Pausable, Ownable {
     function canAutoSave(address user) external view returns (bool) {
         UserAccount memory account = s_accounts[user];
         if (!account.isActive) return false;
+        if (account.lastSaveTimestamp == 0) return true; // First save always allowed
         return block.timestamp >= account.lastSaveTimestamp + MIN_SAVE_INTERVAL;
     }
 
@@ -379,11 +358,11 @@ contract SavingsVault is ReentrancyGuard, Pausable, Ownable {
     }
 
     /**
-     * @notice Get x402 executor address
-     * @return x402 executor contract address
+     * @notice Get backend server address
+     * @return Backend server address
      */
-    function x402Executor() external view returns (address) {
-        return s_x402Executor;
+    function backendServer() external view returns (address) {
+        return s_backendServer;
     }
 
     // =============================================================
@@ -403,15 +382,15 @@ contract SavingsVault is ReentrancyGuard, Pausable, Ownable {
     }
 
     /**
-     * @notice Set the x402 executor contract address
-     * @param _x402Executor Address of x402Executor contract
-     * @dev Only owner can call. Used after deploying x402 executor.
+     * @notice Set the backend server address
+     * @param _backendServer Address of backend server
+     * @dev Only owner can call. This server can call depositFor after x402 payment verification.
      */
-    function setX402Executor(address _x402Executor) external onlyOwner {
-        if (_x402Executor == address(0)) revert SavingsVault__ZeroAddress();
-        address oldExecutor = s_x402Executor;
-        s_x402Executor = _x402Executor;
-        emit X402ExecutorUpdated(oldExecutor, _x402Executor);
+    function setBackendServer(address _backendServer) external onlyOwner {
+        if (_backendServer == address(0)) revert SavingsVault__ZeroAddress();
+        address oldServer = s_backendServer;
+        s_backendServer = _backendServer;
+        emit BackendServerUpdated(oldServer, _backendServer);
     }
 
     /**
