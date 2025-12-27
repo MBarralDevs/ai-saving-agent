@@ -6,9 +6,9 @@ solc = "0.8.20"
 optimizer = true
 optimizer_runs = 200
 
-# Updated remappings to point to lib at root
+# Point to lib one level up
 remappings = [
-    "@openzeppelin/=../lib/openzeppelin-contracts/"
+    "@openzeppelin/contracts/=../lib/openzeppelin-contracts/contracts/"
 ]
 
 # Cronos Testnet config (for later deployment)
