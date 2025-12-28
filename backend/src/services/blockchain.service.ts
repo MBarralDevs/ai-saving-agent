@@ -25,3 +25,40 @@ const USDC_ABI = [
   'function balanceOf(address account) view returns (uint256)',
   'function decimals() view returns (uint8)',
 ];
+
+
+export class BlockchainService {
+  // Private properties - only accessible within this class
+  private provider: ethers.JsonRpcProvider;  // Connection to blockchain
+  private backendWallet: ethers.Wallet;      // Our wallet (can sign txs)
+  private savingsVault: ethers.Contract;     // SavingsVault contract instance
+  private usdc: ethers.Contract;             // USDC contract instance
+
+  constructor() {
+    // 1. Initialize provider (connection to Cronos)
+    this.provider = new ethers.JsonRpcProvider(config.cronosRpcUrl);
+    
+    // 2. Initialize backend wallet
+    // Wallet = private key + provider = can sign transactions
+    this.backendWallet = new ethers.Wallet(
+      config.backendPrivateKey,  // Your private key from .env
+      this.provider              // Connected to Cronos
+    );
+
+    // 3. Initialize SavingsVault contract
+    this.savingsVault = new ethers.Contract(
+      config.savingsVaultAddress,  // Where the contract lives
+      SAVINGS_VAULT_ABI,            // How to talk to it
+      this.backendWallet            // Who's calling it (for state changes)
+    );
+
+    // 4. Initialize USDC contract (read-only, no wallet needed)
+    this.usdc = new ethers.Contract(
+      config.usdcAddress,
+      USDC_ABI,
+      this.provider  // Just provider, not wallet (we only read)
+    );
+
+    console.log('✅ Blockchain service initialized');
+    console.log('Backend wallet address:', this.backendWallet.address);
+  }}
