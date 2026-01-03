@@ -1,4 +1,4 @@
-import { FacilitatorClient } from '@crypto.com/facilitator-client';
+import { Facilitator, CronosNetwork, PaymentRequirements } from '@crypto.com/facilitator-client';
 import { config } from '../config/env';
 import { X402PaymentPayload, X402VerifyResponse } from '../types';
 
@@ -7,25 +7,28 @@ import { X402PaymentPayload, X402VerifyResponse } from '../types';
  * 
  * Integrates with Cronos x402 Facilitator for gasless USDC payments.
  * 
- * How it works:
+ * Flow:
  * 1. User creates EIP-3009 signature off-chain (free)
  * 2. Frontend sends signature in X-PAYMENT header
- * 3. We verify signature with Cronos Facilitator
+ * 3. We verify and settle with Cronos Facilitator
  * 4. Facilitator executes USDC.transferWithAuthorization()
- * 5. USDC moves to our vault, facilitator pays gas
- * 
- * Cronos Facilitator URL (testnet):
- * https://x402-facilitator.cronos.org
+ * 5. USDC moves to vault, facilitator pays gas
  */
 export class X402Service {
-  private facilitatorClient: FacilitatorClient;
+  private facilitator: Facilitator;
+  private network: CronosNetwork;
 
   constructor() {
-    // Initialize Cronos Facilitator client
-    this.facilitatorClient = new FacilitatorClient({
-      url: config.x402FacilitatorUrl,
+    // Determine network from config (cronos-testnet or cronos-mainnet)
+    this.network = (config.cronosChainId === 338 
+      ? 'cronos-testnet' 
+      : 'cronos-mainnet') as CronosNetwork;
+
+    // Initialize Facilitator SDK
+    this.facilitator = new Facilitator({ 
+      network: this.network 
     });
 
     console.log('✅ x402 service initialized');
-    console.log('Facilitator URL:', config.x402FacilitatorUrl);
+    console.log('Network:', this.network);
   }}
