@@ -4,7 +4,9 @@ import {
   PaymentRequirements,
   VerifyRequest,
   X402VerifyResponse,
-  X402SettleResponse
+  X402SettleResponse,
+  Scheme,
+  Contract
 } from '@crypto.com/facilitator-client';
 import { config } from '../config/env';
 
@@ -26,12 +28,19 @@ import { config } from '../config/env';
 export class X402Service {
   private facilitator: Facilitator;
   private network: CronosNetwork;
+  private assetContract: Contract;
 
   constructor() {
     // Determine network from chain ID
     this.network = (config.cronosChainId === 338 
       ? CronosNetwork.CronosTestnet 
       : CronosNetwork.CronosMainnet) as CronosNetwork;
+
+    // Determine asset contract based on network
+    // Testnet uses DevUSDCe, Mainnet uses USDCe
+    this.assetContract = this.network === CronosNetwork.CronosTestnet
+      ? Contract.DevUSDCe
+      : Contract.USDCe;
 
     // Initialize Facilitator SDK
     this.facilitator = new Facilitator({ 
@@ -40,6 +49,7 @@ export class X402Service {
 
     console.log('✅ x402 service initialized');
     console.log('Network:', this.network);
+    console.log('Asset:', this.assetContract);
   }
 
   /**
@@ -180,16 +190,16 @@ export class X402Service {
     paymentId: string
   ): PaymentRequirements {
     return {
-      scheme: 'exact',
+      scheme: Scheme.Exact, // Use Scheme enum
       network: this.network,
       payTo: config.savingsVaultAddress,
-      asset: config.usdcAddress,
+      asset: this.assetContract, // Use Contract enum
       maxAmountRequired: amount,
       maxTimeoutSeconds: 300,
       description: 'AI Savings Agent - Auto-save deposit',
       resource: `${process.env.PUBLIC_URL || 'http://localhost:3000'}/api/save`,
       mimeType: 'application/json',
-      extra: { paymentId }, // Include payment ID in response
+      extra: { paymentId },
     };
   }
 
@@ -198,5 +208,12 @@ export class X402Service {
    */
   getNetwork(): CronosNetwork {
     return this.network;
+  }
+
+  /**
+   * Get asset contract being used
+   */
+  getAssetContract(): Contract {
+    return this.assetContract;
   }
 }
