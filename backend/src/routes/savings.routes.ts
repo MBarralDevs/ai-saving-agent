@@ -108,7 +108,7 @@ router.get('/user/:address', async (req: Request, res: Response) => {
  * 3. If yes, verify and settle payment
  * 4. Credit user's account via depositFor()
  */
-router.post('/api/save', async (req: Request, res: Response) => {
+router.post('/save', async (req: Request, res: Response) => {
   try {
     const { user, amount } = req.body;
 
