@@ -36,7 +36,7 @@ export class X402Service {
   /**
    * Verify and settle x402 payment
    * 
-   * FIXED: Decode header and pass parsed payload to SDK
+   * ✅ CORRECT: Keep paymentHeader as base64 string
    */
   async verifyAndSettle(
     paymentId: string,
@@ -48,29 +48,18 @@ export class X402Service {
       console.log('  Payment ID:', paymentId);
       console.log('  Network:', this.network);
 
-      // Decode and parse the payment header
-      let parsedPayload: any;
-      try {
-        const decoded = Buffer.from(paymentHeader, 'base64').toString('utf-8');
-        parsedPayload = JSON.parse(decoded);
-        
-        console.log('✅ Payment header decoded');
-        console.log('  From:', parsedPayload.from);
-        console.log('  To:', parsedPayload.to);
-        console.log('  Value:', (parseInt(parsedPayload.value) / 1_000_000).toFixed(2), 'USDC');
-      } catch (error) {
-        console.error('❌ Failed to parse payment header:', error);
-        return {
-          ok: false,
-          error: 'invalid_payment_header',
-          details: { message: 'Could not decode payment header' },
-        };
+      // Parse header for logging only (don't send parsed version)
+      const parsed = this.parsePaymentHeader(paymentHeader);
+      if (parsed) {
+        console.log('  From:', parsed.from);
+        console.log('  To:', parsed.to);
+        console.log('  Value:', (parseInt(parsed.value) / 1_000_000).toFixed(2), 'USDC');
       }
 
-      // Build request body with PARSED payload (not base64)
+      // Build request body - keep paymentHeader as base64 string
       const body: VerifyRequest = {
         x402Version: 1,
-        paymentHeader: parsedPayload, // ✅ Send parsed object, not base64
+        paymentHeader,  // ✅ Keep as base64 string
         paymentRequirements,
       };
 
@@ -125,7 +114,7 @@ export class X402Service {
   }
 
   /**
-   * Parse X-PAYMENT header
+   * Parse X-PAYMENT header for logging/validation
    */
   parsePaymentHeader(headerValue: string): any | null {
     try {
