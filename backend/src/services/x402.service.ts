@@ -148,22 +148,32 @@ export class X402Service {
   }
 
   createPaymentRequirements(
-    amount: string,
-    paymentId: string
-  ): PaymentRequirements {
-    return {
-      scheme: Scheme.Exact,
-      network: this.network,
-      payTo: config.savingsVaultAddress,
-      asset: this.assetContract,
-      maxAmountRequired: amount,
-      maxTimeoutSeconds: 300,
-      description: 'AI Savings Agent - Auto-save deposit',
-      resource: `${process.env.PUBLIC_URL || 'http://localhost:3000'}/api/save`,
-      mimeType: 'application/json',
-      extra: { paymentId },
-    };
-  }
+  amount: string,
+  paymentId: string
+): PaymentRequirements {
+  const requirements = {
+    scheme: Scheme.Exact,
+    network: this.network,
+    payTo: config.savingsVaultAddress,
+    asset: this.assetContract,
+    maxAmountRequired: amount,
+    maxTimeoutSeconds: 300,
+    description: 'AI Savings Agent - Auto-save deposit',
+    resource: `${process.env.PUBLIC_URL || 'http://localhost:3000'}/api/save`,
+    mimeType: 'application/json',
+    extra: { paymentId },
+  };
+
+  // 🔍 DEBUG: Log what we're creating
+  console.log('🔍 DEBUG Payment Requirements:');
+  console.log('  scheme:', requirements.scheme);
+  console.log('  network:', requirements.network);
+  console.log('  asset:', requirements.asset);
+  console.log('  asset type:', typeof requirements.asset);
+  console.log('  Contract.DevUSDCe:', Contract.DevUSDCe);
+
+  return requirements;
+}
 
   getNetwork(): CronosNetwork {
     return this.network;
@@ -172,4 +182,6 @@ export class X402Service {
   getAssetContract(): Contract {
     return this.assetContract;
   }
+
+  
 }
