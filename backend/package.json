@@ -3,22 +3,20 @@
   "version": "1.0.0",
   "description": "Backend API for AI Savings Agent with x402 integration",
   "main": "dist/server.js",
-  
   "scripts": {
     "dev": "nodemon --exec ts-node src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "clean": "rm -rf dist",
-    
     "test:blockchain": "ts-node src/tests/test-blockchain.ts",
     "test:create-user": "ts-node src/tests/test-create-user.ts",
     "test:setup-user": "ts-node src/tests/test-setup-user.ts",
     "test:api": "ts-node src/tests/test-api.ts",
     "test:decision": "ts-node src/tests/test-decision-engine.ts",
     "test:all": "npm run test:blockchain && npm run test:api",
-    "test:full-flow": "ts-node src/tests/test-full-flow.ts"
-  }
-,
+    "test:full-flow": "ts-node src/tests/test-full-flow.ts",
+    "check:account": "tsx scripts/check-account.ts"
+  },
   "keywords": [
     "x402",
     "cronos",
@@ -40,7 +38,7 @@
     "@types/node": "^25.0.3",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
-  
 }
