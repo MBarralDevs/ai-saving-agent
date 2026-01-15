@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { config, validateConfig } from './config/env';
 import savingsRoutes from './routes/savings.routes';
+import { SchedulerService } from './services/scheduler.service';
 
 /**
  * Express Server for AI Savings Agent Backend
@@ -25,6 +26,9 @@ try {
 
 // Initialize Express app
 const app = express();
+
+// Initialize Scheduler Service
+const scheduler = new SchedulerService();
 
 // ============================================================================
 //                              MIDDLEWARE
@@ -78,16 +82,22 @@ app.get('/', (req: Request, res: Response) => {
       health: 'GET /api/health',
       user: 'GET /api/user/:address',
       save: 'POST /api/save',
+      schedulerStatus: 'GET /api/scheduler/status', // NEW
     },
     documentation: 'https://github.com/MBarralDevs/ai-saving-agent',
   });
 });
 
-/**
- * Mount savings routes under /api
- */
+// Mount savings routes under /api
 app.use('/api', savingsRoutes);
 
+// NEW: Scheduler status endpoint
+app.get('/api/scheduler/status', (req: Request, res: Response) => {
+  res.json({
+    success: true,
+    data: scheduler.getStatus(),
+  });
+});
 /**
  * 404 Handler
  * Handles requests to undefined routes
@@ -144,7 +154,14 @@ const startServer = async () => {
       console.log(`   GET  http://localhost:${PORT}/api/health`);
       console.log(`   GET  http://localhost:${PORT}/api/user/:address`);
       console.log(`   POST http://localhost:${PORT}/api/save`);
+      console.log(`   GET  http://localhost:${PORT}/api/scheduler/status`); // NEW
       console.log('');
+      
+      // Start the AI scheduler
+      console.log('🤖 Starting AI Decision Engine Scheduler...');
+      scheduler.start();
+      console.log('');
+      
       console.log('✅ Ready to accept requests!');
       console.log('🚀 ========================================');
       console.log('');
@@ -161,10 +178,12 @@ startServer();
 // Handle graceful shutdown
 process.on('SIGTERM', () => {
   console.log('📴 SIGTERM signal received: closing HTTP server');
+  scheduler.stop(); // NEW
   process.exit(0);
 });
 
 process.on('SIGINT', () => {
   console.log('📴 SIGINT signal received: closing HTTP server');
+  scheduler.stop(); // NEW
   process.exit(0);
 });

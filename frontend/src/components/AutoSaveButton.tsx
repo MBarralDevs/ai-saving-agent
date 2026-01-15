@@ -110,9 +110,9 @@ export function AutoSaveButton({ userAddress, canAutoSave, onSuccess }: AutoSave
         {/* 
           Button text changes based on state:
           - "Processing..." when isLoading = true
-          - "Save $25 to Vault" when idle
+          - "Save $5 to Vault" when idle
         */}
-        {isLoading ? 'Processing...' : 'Save $5 to Vault'}  //Changed from 'Save $25...'
+        {isLoading ? 'Processing...' : 'Save $5 to Vault'} 
       </button>
 
       {/* ============================================
