@@ -15,8 +15,13 @@ export const config = {
   
   // Our deployed contract addresses
   savingsVaultAddress: process.env.SAVINGS_VAULT_ADDRESS || '',
-  vvsYieldStrategyAddress: process.env.VVS_YIELD_STRATEGY_ADDRESS || '',
   usdcAddress: process.env.USDC_ADDRESS || '',
+  
+  // VVS Yield Strategy
+  vvsYieldStrategyAddress: process.env.VVS_YIELD_STRATEGY_ADDRESS || '',
+  usdtAddress: process.env.USDT_ADDRESS || '',
+  vvsRouterAddress: process.env.VVS_ROUTER_ADDRESS || '',
+  usdcUsdtPairAddress: process.env.USDC_USDT_PAIR_ADDRESS || '',
   
   // Backend wallet private key
   backendPrivateKey: process.env.BACKEND_PRIVATE_KEY || '',
