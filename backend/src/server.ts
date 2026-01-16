@@ -3,6 +3,7 @@ import cors from 'cors';
 import { config, validateConfig } from './config/env';
 import savingsRoutes from './routes/savings.routes';
 import { SchedulerService } from './services/scheduler.service';
+import aiRoutes from './routes/ai.routes';
 
 /**
  * Express Server for AI Savings Agent Backend
@@ -90,6 +91,8 @@ app.get('/', (req: Request, res: Response) => {
 
 // Mount savings routes under /api
 app.use('/api', savingsRoutes);
+
+app.use('/api/ai', aiRoutes);
 
 // NEW: Scheduler status endpoint
 app.get('/api/scheduler/status', (req: Request, res: Response) => {

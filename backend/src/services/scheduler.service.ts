@@ -102,7 +102,7 @@ export class SchedulerService {
         const account = await this.blockchainService.getUserAccount(address);
         
         // Check if active and in AUTO mode
-        if (account.isActive && account.trustMode === 1) {
+        if (account.isActive && account.trustMode === 1n) {  // ✅ Compare BigInt to BigInt
           activeAutoAccounts.push(address);
         }
       } catch (error) {
@@ -163,31 +163,27 @@ export class SchedulerService {
   /**
    * Get user's current financial state for decision making
    */
-  private async getUserFinancialState(userAddress: string): Promise<UserFinancialState> {
-    // Get on-chain data
-    const account = await this.blockchainService.getUserAccount(userAddress);
-    const canSave = await this.blockchainService.canAutoSave(userAddress);
-    
-    // Get wallet balance
-    const walletBalance = await this.blockchainService.getWalletUsdcBalance(userAddress);
+private async getUserFinancialState(userAddress: string): Promise<UserFinancialState> {
+  const account = await this.blockchainService.getUserAccount(userAddress);
+  const canSave = await this.blockchainService.canAutoSave(userAddress);
+  const walletBalance = await this.blockchainService.getWalletUsdcBalance(userAddress);
 
-    // Calculate time since last save
-    const now = Math.floor(Date.now() / 1000);
-    const lastSave = Number(account.lastSaveTimestamp);
-    const timeSinceLastSave = lastSave === 0 ? 0 : (now - lastSave) / 3600; // hours
+  const now = Math.floor(Date.now() / 1000);
+  const lastSave = Number(account.lastSaveTimestamp);
+  const timeSinceLastSave = lastSave === 0 ? 0 : (now - lastSave) / 3600;
 
-    return {
-      walletBalance,
-      currentSavings: account.currentBalance,
-      weeklyGoal: account.weeklyGoal,
-      safetyBuffer: account.safetyBuffer,
-      lastSaveTimestamp: account.lastSaveTimestamp,
-      trustMode: account.trustMode === 0 ? 'MANUAL' : 'AUTO',
-      isActive: account.isActive,
-      canAutoSave: canSave,
-      timeSinceLastSave,
-    };
-  }
+  return {
+    walletBalance,
+    currentSavings: account.currentBalance,
+    weeklyGoal: account.weeklyGoal,
+    safetyBuffer: account.safetyBuffer,
+    lastSaveTimestamp: account.lastSaveTimestamp,
+    trustMode: account.trustMode === 0n ? 'MANUAL' : 'AUTO',  // Fix: Use 0n
+    isActive: account.isActive,
+    canAutoSave: canSave,
+    timeSinceLastSave,
+  };
+}
 
   /**
    * Format USDC amount for logging
