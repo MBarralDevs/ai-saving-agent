@@ -1,5 +1,12 @@
 /**
- * Global Styles for AI Savings Agent
+ * Enhanced Styles for AI Savings Agent
+ * 
+ * Features:
+ * - Smooth animations and transitions
+ * - Glassmorphism effects
+ * - Mobile responsive design
+ * - Modern gradient backgrounds
+ * - Hover effects
  */
 
 /* ============================================
@@ -18,9 +25,15 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #f5f5f5;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background-attachment: fixed;
   color: #333;
   line-height: 1.6;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
 }
 
 /* ============================================
@@ -29,14 +42,15 @@ body {
 
 h1 {
   font-size: 2.5rem;
-  font-weight: 700;
+  font-weight: 800;
   color: #1a1a1a;
   margin-bottom: 0.5rem;
+  letter-spacing: -1px;
 }
 
 h2 {
   font-size: 1.75rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #2a2a2a;
   margin-bottom: 1rem;
 }
@@ -52,13 +66,109 @@ p {
 }
 
 /* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes spin {
+  0% { 
+    transform: rotate(0deg); 
+  }
+  100% { 
+    transform: rotate(360deg); 
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-20px) scale(1.05);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 200%;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(102, 126, 234, 0.6);
+  }
+}
+
+/* ============================================
+   CARD HOVER EFFECTS
+   ============================================ */
+
+.stat-card {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12) !important;
+}
+
+/* ============================================
    LINKS
    ============================================ */
 
 a {
-  color: #5865F2;
+  color: #667eea;
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
+  font-weight: 600;
 }
 
 a:hover {
@@ -67,7 +177,7 @@ a:hover {
 }
 
 a:visited {
-  color: #7983F5;
+  color: #764ba2;
 }
 
 /* ============================================
@@ -77,22 +187,116 @@ a:visited {
 button {
   font-family: inherit;
   font-size: inherit;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  border: none;
+  outline: none;
 }
 
 button:not(:disabled):hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 button:not(:disabled):active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* ============================================
+   LOADING SPINNER
+   ============================================ */
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* ============================================
+   GLASSMORPHISM EFFECT
+   ============================================ */
+
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #4752C4 0%, #5a3470 100%);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+/* Mobile - Stack components vertically */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+  }
+
+  /* Make all grid layouts single column on mobile */
+  div[style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Adjust padding for mobile */
+  body {
+    padding: 1rem;
+  }
+
+  /* Reduce card padding on mobile */
+  .stat-card {
+    padding: 1.5rem !important;
+  }
+
+  /* Stack hero elements */
+  div[style*="flex-direction"] {
+    flex-wrap: wrap;
+  }
+}
+
+/* Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+  h1 {
+    font-size: 2.25rem;
+  }
+}
+
+/* Desktop - Large screens */
+@media (min-width: 1400px) {
+  h1 {
+    font-size: 3rem;
+  }
 }
 
 /* ============================================
@@ -119,27 +323,61 @@ button:disabled {
   margin-bottom: 1rem;
 }
 
+.fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.slide-in {
+  animation: slideIn 0.5s ease-out;
+}
+
+.pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
 /* ============================================
-   RESPONSIVE DESIGN
+   PRINT STYLES
    ============================================ */
 
-/* Mobile - Stack components vertically */
-@media (max-width: 768px) {
-  h1 {
-    font-size: 2rem;
+@media print {
+  body {
+    background: white;
   }
 
-  h2 {
-    font-size: 1.5rem;
-  }
-
-  /* Make grid layouts single column on mobile */
-  div[style*="grid-template-columns"] {
-    grid-template-columns: 1fr !important;
+  button {
+    display: none;
   }
 }
 
-/* Tablet and up */
-@media (min-width: 769px) {
-  /* Styles already defined above */
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+/* Focus styles for keyboard navigation */
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* Reduced motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  body {
+    background: white;
+  }
+
+  button {
+    border: 2px solid currentColor;
+  }
 }
