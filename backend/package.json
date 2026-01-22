@@ -15,6 +15,7 @@
     "test:decision": "tsx src/tests/test-decision-engine.ts",
     "test:full-flow": "tsx src/tests/test-full-flow.ts",
     "check:account": "tsx scripts/check-account.ts",
+    "diagnose": "tsx scripts/diagnose-usdc.ts",
     "verify:vvs": "tsx scripts/verify-vvs.ts",
     "set:auto": "tsx scripts/set-auto-mode.ts"
   },

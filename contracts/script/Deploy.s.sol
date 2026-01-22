@@ -3,52 +3,68 @@ pragma solidity 0.8.20;
 
 import {Script, console2} from "lib/forge-std/src/Script.sol";
 import {SavingsVault} from "../src/SavingsVault.sol";
-import {VVSYieldStrategy} from "../src/VVSYieldStrategy.sol";
 
-// Mock USDC for testnet (we'll deploy our own)
-import {MockUSDC} from "../test/mocks/MockUSDC.t.sol";
-
+/**
+ * Deploy SavingsVault with Real Testnet USDC
+ *
+ * This script deploys the SavingsVault using the real Cronos testnet USDC.
+ * The USDC address should be set in your .env file.
+ *
+ * Usage:
+ * forge script script/Deploy.s.sol --rpc-url $CRONOS_RPC_URL --broadcast
+ */
 contract DeployScript is Script {
-    // Cronos Testnet addresses (we'll use mocks for testing)
-    // If real VVS testnet exists, update these addresses
-    address constant VVS_ROUTER = address(0); // We'll deploy mocks
-    address constant USDT = address(0); // We'll deploy mocks
-    address constant USDC_USDT_PAIR = address(0); // We'll deploy mocks
-
     function run() external {
-        // Read private key from environment
+        // Read from environment
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        address usdc = vm.envAddress("USDC_ADDRESS");
         address deployer = vm.addr(deployerPrivateKey);
 
-        console2.log("Deploying contracts with account:", deployer);
-        console2.log("Account balance:", deployer.balance);
+        console2.log("========================================");
+        console2.log("Deploying SavingsVault");
+        console2.log("========================================");
+        console2.log("");
+        console2.log("Deployer:", deployer);
+        console2.log("Balance:", deployer.balance / 1e18, "CRO");
+        console2.log("Using USDC:", usdc);
+        console2.log("");
 
         vm.startBroadcast(deployerPrivateKey);
 
-        // Step 1: Deploy Mock USDC (for testnet)
-        console2.log("\n1. Deploying Mock USDC...");
-        MockUSDC usdc = new MockUSDC();
-        console2.log("Mock USDC deployed at:", address(usdc));
-
-        // Step 2: Deploy SavingsVault
-        console2.log("\n2. Deploying SavingsVault...");
-        SavingsVault vault = new SavingsVault(address(usdc));
+        // Deploy SavingsVault with real USDC
+        console2.log("Deploying SavingsVault...");
+        SavingsVault vault = new SavingsVault(usdc);
         console2.log("SavingsVault deployed at:", address(vault));
-
-        // For now, we'll skip VVSYieldStrategy deployment since VVS testnet might not exist
-        // We'll deploy it manually later when we have real VVS addresses
-        console2.log("\n Deployment complete!");
-        console2.log("\nContract Addresses:");
-        console2.log("-------------------");
-        console2.log("USDC:", address(usdc));
-        console2.log("SavingsVault:", address(vault));
-        console2.log("\nSave these addresses to backend/.env");
 
         vm.stopBroadcast();
 
-        // Verify vault configuration
-        console2.log("\nVerifying deployment...");
-        console2.log("Vault owner:", vault.owner());
+        // Verify deployment
+        console2.log("");
+        console2.log("========================================");
+        console2.log("Deployment Complete!");
+        console2.log("========================================");
+        console2.log("");
+        console2.log("Contract Addresses:");
+        console2.log("-------------------");
+        console2.log("USDC:", usdc);
+        console2.log("SavingsVault:", address(vault));
+        console2.log("");
+        console2.log("Verification:");
+        console2.log("-------------");
+        console2.log("Vault Owner:", vault.owner());
         console2.log("Vault USDC:", address(vault.i_USDC()));
+        console2.log("");
+        console2.log("Next Steps:");
+        console2.log("-----------");
+        console2.log("1. Update backend/.env:");
+        console2.log("   SAVINGS_VAULT_ADDRESS=", address(vault));
+        console2.log("   USDC_ADDRESS=", usdc);
+        console2.log("");
+        console2.log("2. Set backend server in vault:");
+        console2.log("   cast send", address(vault), '"setBackendServer(address)" <BACKEND_WALLET_ADDRESS>');
+        console2.log("");
+        console2.log("3. Deploy VVS mocks:");
+        console2.log("   forge script script/DeployMockVVS.s.sol --rpc-url $CRONOS_RPC_URL --broadcast");
+        console2.log("");
     }
 }
