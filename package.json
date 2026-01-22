@@ -1,6 +1,7 @@
 {
-  "name": "ai-savings-agent",
+  "name": "pigment",
   "version": "1.0.0",
+  "description": "Pigment - AI-powered automated DeFi savings. Drop by drop, build your financial masterpiece.",
   "private": true,
   "workspaces": [
     "backend"

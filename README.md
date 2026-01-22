@@ -1,8 +1,10 @@
-# 🤖 AI Savings Agent
+# 🎨 Pigment
 
 > **Automated DeFi savings powered by AI, x402 payments, and VVS Finance yield generation on Cronos**
 
 An intelligent savings application that automatically manages user savings goals through AI-driven decision making, gasless x402 micropayments, and DeFi yield optimization via VVS Finance liquidity provision.
+
+**Drop by drop, build your financial masterpiece.**
 
 Built for the **Cronos x402 Hackathon** (Dec 2024 - Jan 2025)
 
@@ -10,12 +12,14 @@ Built for the **Cronos x402 Hackathon** (Dec 2024 - Jan 2025)
 
 ## 🎯 Overview
 
-AI Savings Agent bridges traditional finance habits with DeFi opportunities by:
+Pigment bridges traditional finance habits with DeFi opportunities by:
 
 - **🧠 AI Decision Engine**: Analyzes wallet balances, safety buffers, and savings goals to make intelligent saving decisions
 - **⚡ x402 Payments**: Enables gasless, instant USDC transfers using EIP-3009 signatures
 - **📈 Automated Yield**: Routes deposits to VVS Finance USDC/USDT liquidity pools for passive income
-- **🎨 Beautiful UX**: Modern, responsive interface with real-time updates and transaction tracking
+- **🎨 Beautiful UX**: Modern, colorful interface with real-time updates and transaction tracking
+
+Like an artist building a masterpiece with careful brushstrokes, Pigment helps you build wealth through consistent, automated micro-savings—adding color to your financial future, drop by drop.
 
 ---
 
@@ -69,14 +73,14 @@ AI Savings Agent bridges traditional finance habits with DeFi opportunities by:
 - Vite for fast development
 - Ethers.js for wallet integration
 - x402 Facilitator Client for payment signing
-- Modern CSS with animations and gradients
+- Modern CSS with vibrant gradients and animations
 
 ---
 
 ## 📦 Project Structure
 
 ```
-ai-savings-agent/
+pigment/
 ├── contracts/               # Smart contracts (Foundry)
 │   ├── src/
 │   │   ├── SavingsVault.sol           # Core vault contract
@@ -88,10 +92,10 @@ ai-savings-agent/
 │
 ├── backend/                 # Node.js API server
 │   ├── src/
-│   │   ├── agent/                     # AI Agent Decision
-│   │   │   ├── decision-engine.ts     # Decision Engine for Agent
-│   │   │   ├── types.ts               # Agent Types
 │   │   ├── routes/                    # API endpoints
+│   │   ├── agent/                     # AI Agent
+│   │   │   ├── decision-engine.ts     # AI Agent Decision Engine
+│   │   │   ├── types.ts               # Types for Decision Engine
 │   │   ├── services/
 │   │   │   ├── blockchain.service.ts  # Smart contract interactions
 │   │   │   ├── x402.service.ts        # Payment verification
@@ -124,8 +128,8 @@ ai-savings-agent/
 
 ```bash
 # Clone repository
-git clone https://github.com/MBarralDevs/ai-saving-agent
-cd ai-savings-agent
+git clone https://github.com/MBarralDevs/Pigment-Finance
+cd pigment
 
 # Install dependencies
 npm install
@@ -403,7 +407,7 @@ npm run preview
 - x402 payment integration
 - VVS Finance yield strategy
 - AI decision engine with scheduling
-- Full-stack application with modern UI
+- Full-stack application with colorful UI
 - Testnet deployment and verification
 
 ### 🔮 Future Enhancements
@@ -414,6 +418,7 @@ npm run preview
 - **Mobile App**: Native iOS/Android applications
 - **Mainnet Deployment**: Production launch on Cronos
 - **Cross-Chain**: Support for other EVM networks
+- **NFT Rewards**: Collectible badges for milestones
 
 ---
 
@@ -471,9 +476,9 @@ MIT License - see LICENSE file for details
 
 ### Judging Criteria Alignment
 
-- **Innovation**: Novel combination of AI, x402, and DeFi yield
+- **Innovation**: Novel combination of AI, x402, and DeFi yield with artistic branding
 - **Technical Complexity**: Full-stack with advanced protocol integrations
-- **User Experience**: Beautiful, intuitive UI with real-time updates
+- **User Experience**: Beautiful, colorful UI with intuitive interactions
 - **Completeness**: Fully functional end-to-end application
 - **x402 Integration**: Proper implementation of payment protocol
 
@@ -483,7 +488,7 @@ MIT License - see LICENSE file for details
 
 For questions or support:
 
-- **GitHub Issues**: [\[Repository Issues\]](https://github.com/MBarralDevs/ai-saving-agent/issues)(link-to-issues)
+- **GitHub Issues**: [https://github.com/MBarralDevs/Pigment-Finance/issues](link-to-issues)
 - **Twitter**: [@MBarralWeb3](link)
 - **Email**: mbarraldevs@outlook.com
 
@@ -498,4 +503,6 @@ For questions or support:
 
 ---
 
-**Built with ❤️ for the Cronos ecosystem**
+**Built with 🎨 for the Cronos ecosystem**
+
+_"Drop by drop, build your financial masterpiece."_

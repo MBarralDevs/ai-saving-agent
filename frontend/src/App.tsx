@@ -166,7 +166,7 @@ function App() {
       {/* ============================================
           HEADER
           ============================================ */}
-      <h1>AI Savings Agent</h1>
+      <h1>Pigment Finance</h1>
       <p style={{ color: '#666', marginBottom: '2rem' }}>
         Automated DeFi savings powered by Cronos x402 payments
       </p>

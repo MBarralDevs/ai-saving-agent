@@ -115,7 +115,7 @@ export function Dashboard({ account, isLoading }: DashboardProps) {
             marginBottom: '1rem',
             textShadow: '0 2px 10px rgba(0,0,0,0.2)',
           }}>
-            Welcome to AI Savings Agent
+            Welcome to Your Pigment Dashboard
           </h2>
           <p style={{ 
             fontSize: '1.2rem', 
@@ -289,7 +289,7 @@ export function Dashboard({ account, isLoading }: DashboardProps) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
           <span style={{ fontSize: '2rem' }}>🤖</span>
           <h3 style={{ margin: 0, fontSize: '1.3rem', fontWeight: '700' }}>
-            AI Decision Engine
+            Pigment Decision Engine
           </h3>
         </div>
         <div style={{ 

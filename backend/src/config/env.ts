@@ -1,5 +1,10 @@
 import dotenv from 'dotenv';
 
+/**
+ * Pigment - Environment Configuration
+ * Drop by drop, build your financial masterpiece
+ */
+
 // Load .env file into process.env
 dotenv.config();
 

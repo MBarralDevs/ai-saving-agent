@@ -1,7 +1,7 @@
 {
-  "name": "ai-savings-backend",
+  "name": "pigment-backend",
   "version": "1.0.0",
-  "description": "Backend API for AI Savings Agent with x402 integration",
+  "description": "Pigment - Automated DeFi savings backend API",
   "main": "dist/server.js",
   "scripts": {
      "dev": "nodemon --exec ts-node src/server.ts",

@@ -6,7 +6,7 @@ import { SchedulerService } from './services/scheduler.service';
 import aiRoutes from './routes/ai.routes';
 
 /**
- * Express Server for AI Savings Agent Backend
+ * Express Server for Pigment Backend
  * 
  * Features:
  * - x402 payment integration
@@ -141,9 +141,8 @@ const startServer = async () => {
 
     app.listen(PORT, () => {
       console.log('');
-      console.log('🚀 ========================================');
-      console.log('🚀  AI Savings Agent Backend Started');
-      console.log('🚀 ========================================');
+      console.log('🎨 Pigment Backend Started');
+      console.log('Drop by drop, building your financial future...');
       console.log('');
       console.log(`📡 Server running on: http://localhost:${PORT}`);
       console.log(`🌍 Environment: ${config.nodeEnv}`);
